@@ -105,6 +105,7 @@ class HttpToolsProtocol(asyncio.Protocol):
         self.server = get_local_addr(transport)
         self.client = get_remote_addr(transport)
         self.scheme = "https" if is_ssl(transport) else "http"
+        self.client_cert = transport.get_extra_info("peercert")
 
         if self.logger.level <= TRACE_LOG_LEVEL:
             prefix = "%s:%d - " % self.client if self.client else ""
@@ -230,6 +231,7 @@ class HttpToolsProtocol(asyncio.Protocol):
             "root_path": self.root_path,
             "headers": self.headers,
             "state": self.app_state.copy(),
+            "client_cert": self.client_cert,
         }
 
     # Parser callbacks
