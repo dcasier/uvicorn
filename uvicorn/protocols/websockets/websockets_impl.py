@@ -124,6 +124,7 @@ class WebSocketProtocol(WebSocketServerProtocol):
         self.server = get_local_addr(transport)
         self.client = get_remote_addr(transport)
         self.scheme = "wss" if is_ssl(transport) else "ws"
+        self.client_cert = transport.get_extra_info("peercert")
 
         if self.logger.isEnabledFor(TRACE_LOG_LEVEL):
             prefix = "%s:%d - " % self.client if self.client else ""
@@ -195,6 +196,7 @@ class WebSocketProtocol(WebSocketServerProtocol):
             "subprotocols": subprotocols,
             "state": self.app_state.copy(),
             "extensions": {"websocket.http.response": {}},
+            "client_cert": self.client_cert,
         }
         task = self.loop.create_task(self.run_asgi())
         task.add_done_callback(self.on_task_complete)
